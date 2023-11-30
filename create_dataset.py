@@ -9,8 +9,8 @@ base_metadata_file = 'metadata.csv'
 audio_file_type = '.wav'
 n_val_files = 100
 dataset_dir = 'audio-dataset'
-val_metadata_file = 'metadata-val.csv'
-train_metadata_file = 'metadata-train.csv'
+val_metadata_file = 'metadata.csv'
+train_metadata_file = 'metadata.csv'
 val_dir = 'val'
 train_dir = 'train'
 
@@ -32,21 +32,20 @@ if __name__ == '__main__':
   val_lines = lines[:n_val_files]  
   train_lines = lines[n_val_files:]
 
+  # create directories
+  os.makedirs(os.path.join(dataset_dir, val_dir), exist_ok=True)
+  os.makedirs(os.path.join(dataset_dir, train_dir), exist_ok=True)
+
   # create temporary metadata files
-  with open(val_metadata_file, 'w') as file:
+  with open(os.path.join(dataset_dir, val_dir, val_metadata_file), 'w') as file:
     for line in val_lines:
       file.write(line)
-  with open(train_metadata_file, 'w') as file:
+  with open(os.path.join(dataset_dir, train_dir, train_metadata_file), 'w') as file:
     for line in train_lines:
       file.write(line)
 
-  # create directories
-  os.mkdir(dataset_dir)
-  os.mkdir(os.path.join(dataset_dir, val_dir))
-  os.mkdir(os.path.join(dataset_dir, train_dir))
-
   # create validation files
-  shutil.move(val_metadata_file, os.path.join(dataset_dir, val_dir, val_metadata_file))
+  # shutil.move(val_metadata_file, os.path.join(dataset_dir, val_dir, val_metadata_file))
   for line in val_lines:
     filename = line.split('|')[0] + audio_file_type
     source_path = os.path.join(raw_wav_dir, filename)
@@ -54,7 +53,7 @@ if __name__ == '__main__':
     shutil.copy2(source_path, dest_path)
 
   # create training files
-  shutil.move(train_metadata_file, os.path.join(dataset_dir, train_dir, train_metadata_file))
+  # shutil.move(train_metadata_file, os.path.join(dataset_dir, train_dir, train_metadata_file))
   for line in train_lines:
     filename = line.split('|')[0] + audio_file_type
     source_path = os.path.join(raw_wav_dir, filename)

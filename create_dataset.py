@@ -6,7 +6,6 @@ import shutil
 
 raw_wav_dir = 'raw-wav'
 base_metadata_file = 'metadata.csv'
-audio_file_type = '.wav'
 n_val_files = 100
 dataset_dir = 'audio-dataset'
 val_metadata_file = 'metadata.csv'
@@ -22,7 +21,7 @@ if __name__ == '__main__':
   lines = []
   with open(base_metadata_file, 'r') as file:
     for line in file:
-      filename = line.split('|')[0] + audio_file_type
+      filename = line.split('|')[0]
       audio_filepath = os.path.join(raw_wav_dir, filename)
       if os.path.exists(audio_filepath):
         lines.append(line)
@@ -36,18 +35,20 @@ if __name__ == '__main__':
   os.makedirs(os.path.join(dataset_dir, val_dir), exist_ok=True)
   os.makedirs(os.path.join(dataset_dir, train_dir), exist_ok=True)
 
-  # create temporary metadata files
+  # create metadata files
   with open(os.path.join(dataset_dir, val_dir, val_metadata_file), 'w') as file:
     for line in val_lines:
-      file.write(line)
+      parts = line.split('|')
+      file.write(parts[0] + '|' + parts[2]) # normalized only
   with open(os.path.join(dataset_dir, train_dir, train_metadata_file), 'w') as file:
     for line in train_lines:
-      file.write(line)
+      parts = line.split('|')
+      file.write(parts[0] + '|' + parts[2]) # normalized only
 
   # create validation files
   # shutil.move(val_metadata_file, os.path.join(dataset_dir, val_dir, val_metadata_file))
   for line in val_lines:
-    filename = line.split('|')[0] + audio_file_type
+    filename = line.split('|')[0]
     source_path = os.path.join(raw_wav_dir, filename)
     dest_path = os.path.join(dataset_dir, val_dir, filename)
     shutil.copy2(source_path, dest_path)
@@ -55,7 +56,7 @@ if __name__ == '__main__':
   # create training files
   # shutil.move(train_metadata_file, os.path.join(dataset_dir, train_dir, train_metadata_file))
   for line in train_lines:
-    filename = line.split('|')[0] + audio_file_type
+    filename = line.split('|')[0]
     source_path = os.path.join(raw_wav_dir, filename)
     dest_path = os.path.join(dataset_dir, train_dir, filename)
     shutil.copy2(source_path, dest_path)
